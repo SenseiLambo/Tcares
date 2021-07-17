@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="w3.css">
+<link rel="stylesheet" href="Raleway.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+</style>
+
+<script language="javascript" type="text/javascript" src="jquery-3.6.0.min.js"></script>
+<script language="javascript" type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script language="javascript" type="text/javascript" src="TCARESABI.js"></script>
+<script language="javascript" type="text/javascript" src="DistributionABI.js"></script>
+
+
+<body class="w3-light-grey">
+
+  <script>
+    const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"))
+
+    var contract;
+
+    function startApp() {
+    }
+
+    async function getTCARESInfo(){
+      // var twerkAddress = "0x25E193FB8c6216b33f82C5e636461D85db6B72c2";
+      var TCARESAddress = "0x6AD9E981cE3a9F559A6B192A1ede0eb8D7eCB546";
+      var tcares = new web3.eth.Contract(TCARES_ABI, TCARESAddress);
+      var tcaresSymbol = await tcares.methods.symbol().call();
+      $('#contractSymbol').html(tcaresSymbol);
+    }
+
+    async function getDistributionInfo(){
+      var distributionAddress = "0x680c2bfB3Be174A1e9F3C2Ef910B8BBaF8b0F77C";
+      var distribution = new web3.eth.Contract(DISTRIBUTION_ABI, distributionAddress);
+
+      // Top Row
+      var distributionEnabled = await distribution.methods.isPayOutEnabled().call();
+      $('#distributionEnabled').html(distributionEnabled);
+      var distributionBonusEnabled = await distribution.methods.isBonusEnabled().call();
+      $('#bonusEnabled').html(distributionBonusEnabled);
+      var distributionBonusPayOutEnabled = await distribution.methods.isBonusPayoutEnabled().call();
+      $('#bonusPayOutEnabled').html(distributionBonusPayOutEnabled);
+      var distributionCycle = await distribution.methods.getCurrentCycle().call();
+      $('#distributionCycle').html(distributionCycle);
+
+      // Progress Meter
+      var distributionHolders = await distribution.methods.getNumHolders().call();
+      var distributionCycleIndex = await distribution.methods.getCurrentCycleIndex().call();
+      var cyclePercent = (distributionCycleIndex/distributionHolders) * 100
+      cyclePercent = Number(cyclePercent).toFixed(0)
+      $('#cycleProgressMeter').css("width",`+${cyclePercent}%`)
+      $('#cycleProgressMeter').html(`${cyclePercent}%`)
+
+      // Total Balances
+      $('#distributionHolders').html(distributionHolders);
+      var distributionTotalBalance = await distribution.methods.getTotalBalance().call();
+      distributionTotalBalance = web3.utils.fromWei(distributionTotalBalance,'ether')
+      distributionTotalBalance = Number(distributionTotalBalance).toFixed(5)
+      $('#distributionTotalBalance').html(distributionTotalBalance);
+      var distributionTotalPayments = await distribution.methods.getTotalPayments().call();
+      distributionTotalPayments = web3.utils.fromWei(distributionTotalPayments,'ether')
+      distributionTotalPayments = Number(distributionTotalPayments).toFixed(5)
+      $('#distributionTotalPayments').html(distributionTotalPayments);
+
+      // Total VIP Balances
+      var distributionBonusHolders = await distribution.methods.getNumBonusEligibleHolders().call();
+      $('#distributionBonusHolders').html(distributionBonusHolders);
+      var distributionBonusTotalBalance = await distribution.methods.getBonusBalance().call();
+      distributionBonusTotalBalance = web3.utils.fromWei(distributionBonusTotalBalance,'ether')
+      distributionBonusTotalBalance = Number(distributionBonusTotalBalance).toFixed(5)
+      $('#bonusTotalBalance').html(distributionBonusTotalBalance);
+      var distributionBonusTotalPayments = await distribution.methods.getTotalBonusPayments().call();
+      distributionBonusTotalPayments = web3.utils.fromWei(distributionBonusTotalPayments,'ether')
+      distributionBonusTotalPayments = Number(distributionBonusTotalPayments).toFixed(5)
+      $('#distributionBonusTotalPayments').html(distributionBonusTotalPayments);
+      var distributionBonusCyclePayment = await distribution.methods.getBonusCyclePayment().call();
+      distributionBonusCyclePayment = web3.utils.fromWei(distributionBonusCyclePayment,'ether')
+      distributionBonusCyclePayment = Number(distributionBonusCyclePayment).toFixed(5)
+      $('#distributionBonusCyclePayment').html(distributionBonusCyclePayment);
+      var distributionBonusCyclePercent = await distribution.methods.getBonusCyclePercentage().call();
+      $('#distributionBonusCyclePercent').html(distributionBonusCyclePercent);
+
+
+      var distributionTotalHoldersPaid = await distribution.methods.getTotalHoldersPaid().call();
+      $('#distributionTotalHoldersPaid').html(distributionTotalHoldersPaid);
+
+    }
+
+//getTCARESInfo();
+getDistributionInfo();
+
+  </script>
+<!-- Top container -->
+<div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
+  <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
+  <span class="w3-bar-item w3-right">Logo</span>
+</div>
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-collapse w3-white w3-animate-left" style="z-index:3;width:300px;" id="mySidebar"><br>
+  <div class="w3-container w3-row">
+    <div class="w3-col s4">
+      <img src="" class="w3-circle w3-margin-right" style="width:46px">
+    </div>
+    <div class="w3-col s8 w3-bar">
+      <span></span><br>
+
+    </div>
+  </div>
+  <hr>
+  <div class="w3-container">
+    <h5>Dashboard</h5>
+  </div>
+  <div class="w3-bar-block">
+    <a href="#" class="w3-bar-item w3-button w3-padding-small w3-hide-large w3-dark-grey w3-hover-black" onclick="w3_close()" title="close menu"><i class="fa fa-remove fa-fw"></i>  Close Menu</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding w3-blue"><i class="fa fa-users fa-fw"></i>  Stuff</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-eye fa-fw"></i>  Stuff</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-users fa-fw"></i>  Stuff</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bullseye fa-fw"></i>  Stuff</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-diamond fa-fw"></i>  Stuff</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bell fa-fw"></i>  Stuff</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-bank fa-fw"></i>  Stuff</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-history fa-fw"></i>  Stuff</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding"><i class="fa fa-cog fa-fw"></i>  Stuff</a><br><br>
+  </div>
+</nav>
+
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+
+  <!-- Header -->
+  <header class="w3-container" style="padding-top:22px">
+    <h5><b><i class="fa fa-dashboard"></i>TCARES Ecosystem Dashboard</b></h5>
+  </header>
+
+  <!-- Cycle Settings and Count -->
+  <div class="w3-row-padding w3-margin-bottom">
+    <div class="w3-row-padding w3-margin-bottom">
+      <div class="w3-quarter">
+        <div class="w3-container w3-blue w3-padding-small">
+          <div class="w3-left"><i class="fa fa-refresh w3-xxxlarge"></i></div>
+          <div class="w3-right">
+            <h3 id="distributionEnabled">##</h3>
+          </div>
+          <div class="w3-clear"></div>
+          <h4>Distribution Enabled</h4>
+        </div>
+      </div>
+      <div class="w3-quarter">
+        <div class="w3-container w3-blue w3-padding-small">
+          <div class="w3-left"><i class="fa fa-refresh w3-xxxlarge"></i></div>
+          <div class="w3-right">
+            <h3 id="distributionCycle">##</h3>
+          </div>
+          <div class="w3-clear"></div>
+          <h4>Current Cycle</h4>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Meter -->
+    <div class="w3-container">
+      <h5>Cycle Progress</h5>
+      <div class="w3-grey">
+        <div class="w3-container w3-center w3-padding w3-green" id="cycleProgressMeter" style="width: 0%">+0%</div>
+      </div>
+    </div>      
+
+    <!-- Distribution Totals -->
+    <div class="w3-row-padding w3-margin-bottom">
+    <h5>Totals</h5>
+      <div class="w3-quarter">
+      <div class="w3-container w3-red w3-padding-small">
+        <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="distributionHolders">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4 id="currentHolders">Holders getting BNB rewards</h4>
+      </div>
+    </div>
+    <div class="w3-quarter">
+      <div class="w3-container w3-teal w3-padding-small">
+        <div class="w3-left"><i class="fa fa-database w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="distributionTotalBalance">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4>Total BNB in Reward Pool</h4>
+      </div>
+    </div>
+    <div class="w3-quarter">
+      <div class="w3-container w3-orange w3-text-white w3-padding-small">
+        <div class="w3-left"><i class="fa fa-money w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="distributionTotalPayments">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4>Total BNB paid to Holders</h4>
+      </div>
+    </div>
+    <div class="w3-quarter">
+      <div class="w3-container w3-orange w3-text-white w3-padding-small">
+        <div class="w3-left"><i class="fa fa-money w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="distributionTotalHoldersPaid">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4>Total BNB Payments Sent</h4>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIP Pool Totals -->
+  <div class="w3-row-padding w3-margin-bottom">
+    <h5>VIP Pool</h5>
+    <div class="w3-quarter">
+      <div class="w3-container w3-blue w3-padding-small">
+        <div class="w3-left"><i class="fa fa-refresh w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="bonusEnabled">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4 id="currentHolders">VIP Pool Enabled</h4>
+      </div>
+    </div>
+    <div class="w3-quarter">
+      <div class="w3-container w3-blue w3-padding-small">
+        <div class="w3-left"><i class="fa fa-refresh w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="bonusPayOutEnabled">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4>VIP Pool PayOut Enabled</h4>
+      </div>
+    </div>
+    <div class="w3-quarter">
+      <div class="w3-container w3-blue w3-padding-small">
+        <div class="w3-left"><i class="fa fa-refresh w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="distributionBonusCyclePercent">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4>VIP Cycle Payout Percent</h4>
+      </div>
+    </div>
+  </div>
+  <div class="w3-row-padding w3-margin-bottom">
+    <div class="w3-quarter">
+      <div class="w3-container w3-red w3-padding-small">
+        <div class="w3-left"><i class="fa fa-users w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="distributionBonusHolders">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4 id="currentHolders">Holders eligible for VIP BNB rewards</h4>
+      </div>
+    </div>
+    <div class="w3-quarter">
+      <div class="w3-container w3-teal w3-padding-small">
+        <div class="w3-left"><i class="fa fa-database w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="bonusTotalBalance">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4>Total BNB in VIP Reward Pool</h4>
+      </div>
+    </div>
+    <div class="w3-quarter">
+      <div class="w3-container w3-orange w3-text-white w3-padding-small">
+        <div class="w3-left"><i class="fa fa-money w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="distributionBonusTotalPayments">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4>Total BNB paid to VIP Holders</h4>
+      </div>
+    </div>
+  </div>
+  <div class="w3-row-padding w3-margin-bottom">
+    <div class="w3-quarter">
+      <div class="w3-container w3-orange w3-text-white w3-padding-small">
+        <div class="w3-left"><i class="fa fa-money w3-xxxlarge"></i></div>
+        <div class="w3-right">
+          <h3 id="distributionBonusCyclePayment">##</h3>
+        </div>
+        <div class="w3-clear"></div>
+        <h4>VIP Cycle Payment Amount</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="w3-panel">
+    <div class="w3-row-padding" style="margin:0 -16px">
+      <div class="w3-twothird">
+        <h5>Feeds</h5>
+        <table class="w3-table w3-striped w3-white">
+          <tr>
+            <td><i class="fa fa-user w3-text-blue w3-large"></i></td>
+            <td>Holders Paid this cycle</td>
+            <td><i>2571 Holders</i></td>
+          </tr>
+          <tr>
+            <td><i class="fa fa-bell w3-text-red w3-large"></i></td>
+            <td>Metric.</td>
+            <td><i>15</i></td>
+          </tr>
+          <tr>
+            <td><i class="fa fa-users w3-text-yellow w3-large"></i></td>
+            <td>Metric.</td>
+            <td><i>17</i></td>
+          </tr>
+          <tr>
+            <td><i class="fa fa-comment w3-text-red w3-large"></i></td>
+            <td>Metric.</td>
+            <td><i>25</i></td>
+          </tr>
+          <tr>
+            <td><i class="fa fa-bookmark w3-text-blue w3-large"></i></td>
+            <td>Metric</td>
+            <td><i>28</i></td>
+          </tr>
+          <tr>
+            <td><i class="fa fa-laptop w3-text-red w3-large"></i></td>
+            <td>Metric.</td>
+            <td><i>35</i></td>
+          </tr>
+          <tr>
+            <td><i class="fa fa-share-alt w3-text-green w3-large"></i></td>
+            <td>Metric.</td>
+            <td><i>39</i></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <hr>
+
+  <!-- Footer -->
+  <footer class="w3-container w3-padding-small w3-light-grey">
+    <h4>FOOTER</h4>
+    <p>Powered by <a href="" target="_blank">Moe</a></p>
+  </footer>
+
+  <!-- End page content -->
+</div>
+
+<script>
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+</script>
+</body>
+</html>
